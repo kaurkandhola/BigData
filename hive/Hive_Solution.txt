@@ -1,0 +1,135 @@
+-----------------------------------------------------------------
+-- CIND 719 - Assignment 2 - Programming Hive
+-----------------------------------------------------------------
+
+-------------------------
+-- Dataset & Preparation
+-------------------------
+
+1. In this assignment, you will work with part of the MovieLens dataset. I selected a 2 files for this assignment which can be found in movielens.zip
+The movielens dataset is a collection of movie ratings data and has been widely used in the industry and academia for experimenting with recommendation algorithms and we see many publications using this dataset to benchmark the performance of their algorithms.
+
+For access to full-sized movielens data, go to http://grouplens.org/datasets/movielens/
+
+2. Unzip the movielens.zip file. 
+
+3. The README file in the zip file will give you information of the project that collected the data
+
+4. The zip contains two data files: u.data and u.item
+
+-->    u.data     -- The dataset has 100000 ratings by 943 users on 1682 movies. The file has 4 tab  ("\t") separated columns.  
+
+-----------------------------
+-- Table description "u.data"
+-- 
+-- field_1     userid
+-- field_2     movieid
+-- field_3     rating
+-- field_4     unixtime
+-----------------------------
+
+-->    u.item     -- Information about the items (movies); this is a list of:
+
+movie id | movie title | release date | video release date | IMDb URL | unknown | Action | Adventure | Animation | Children's | Comedy | Crime | Documentary | Drama | Fantasy | Film-Noir | Horror | Musical | Mystery | Romance | Sci-Fi | Thriller | War | Western |
+The last 19 fields are the genres, a 1 indicates the movie is of that genre, a 0 indicates it is not; movies can be in several genres at once.
+The movie ids are the ones used in the u.data data set.
+
+5. Copy u.data and u.item to the virtual linux machine (Filezilla)
+
+6. Copy u.data and u.item from virtual linux machine into HDFS (hadoop fs -put)
+
+7. Create one table for u.data and one table for u.item in Hive and load the data.
+
+
+------------------------
+-- Assignment Questions
+------------------------
+
+# Create a database called ml and table called userratings (tab-delimited)
+hive> CREATE DATABASE ml;
+hive> CREATE TABLE ml.userratings
+     (userid INT, movieid INT, rating INT,
+      unixtime BIGINT) ROW FORMAT DELIMITED
+      FIELDS TERMINATED BY '\t'
+      STORED AS TEXTFILE;
+hive> LOAD DATA INPATH '/user/lab/u.data'
+      INTO TABLE ml.userratings;
+
+# Create a table called movies 
+hive> CREATE TABLE ml.movies
+         (movieid INT, 
+          movie_title STRING, 
+          release_date STRING,
+          v_release_date STRING,
+          imdb_url STRING,
+          cat_unknown INT,
+          cat_action INT, 
+          cat_adventure INT,
+          cat_animation INT,
+          cat_children INT,
+          cat_comedy INT,
+          cat_crime INT,
+          cat_documentary INT, 
+          cat_drama INT, 
+          cat_fantasy INT,
+          cat_fill_noir INT,
+          cat_horror INT,
+          cat_musical INT,
+          cat_mystery INT,
+          cat_romance INT,
+          cat_scifi INT,
+          cat_thriller INT,
+          cat_war INT,
+          cat_western INT) 
+      ROW FORMAT DELIMITED
+      FIELDS TERMINATED BY '|'
+      STORED AS TEXTFILE;
+hive> LOAD DATA INPATH '/user/lab/u.item'
+      INTO TABLE ml.Movies;
+
+1. How many records are there in both tables?
+
+SELECT count(*) FROM ml.movies;
+SELECT count(*) FROM ml.userratings;
+
+2. Find the name of all movies released in 1990.
+
+SELECT movie_title FROM ml.movies WHERE release_date LIKE '%1990';
+
+3. List the movieid of the 10 most rated films that received the most ratings (not necessarily highest rating) in the table you created from u.data.
+
+SELECT movieid ,COUNT(*) AS rt_cnt FROM ml.userratings 
+GROUP BY movieid 
+ORDER BY rt_cnt DESC 
+LIMIT 10;
+
+4. Use a join to list the titles of the movies you found in step 3.
+
+SELECT movies.movie_title, userratings.movieid ,COUNT(*) AS rt_cnt 
+FROM ml.userrating INNER JOIN ml.movies
+ON movies.movieid = userratings.movieid
+GROUP BY userratings.movieid (you may need to use 'GROUP BY movies.movie_title, userratings.movieid' depending on your Hive version)
+ORDER BY rt_cnt DESC
+LIMIT 10;
+
+5. Find the highest rated sci_fi movie.
+
+SELECT movies.movie_title, AVG(userratings.rating) AS avg_rate 
+(or alternatively SELECT movies.movie_title, SUM(userratings.rating) AS avg_rate)
+FROM ml.userrating INNER JOIN ml.movies
+ON movies.movieid = userratings.movieid
+WHERE movies.cat_scifi=1
+GROUP BY userratings.movieid (you may need to use 'GROUP BY movies.movie_title, userratings.movieid' depending on your Hive version)
+ORDER BY avg_rate DESC
+LIMIT 1;
+
+BONUS: Are there any movies with no ratings? (Hint: outer join and IS NULL) 
+
+SELECT  movie_title
+FROM ml.movies LEFT OUTER JOIN ml.userratings
+ON (movies.movieid = userratings.movieid)
+WHERE userratings.movieid IS NULL;
+
+
+
+

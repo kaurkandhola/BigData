@@ -1,0 +1,62 @@
+-----------------------------------------------------------------
+-- CIND 719 - Assignment 2 - Programming Hive
+-----------------------------------------------------------------
+
+-------------------------
+-- Dataset & Preparation
+-------------------------
+
+1. In this assignment, you will work with part of the MovieLens dataset. I selected a 2 files for this assignment which can be found in movielens.zip
+The movielens dataset is a collection of movie ratings data and has been widely used in the industry and academia for experimenting with recommendation algorithms and we see many publications using this dataset to benchmark the performance of their algorithms.
+
+For access to full-sized movielens data, go to http://grouplens.org/datasets/movielens/
+
+2. Unzip the movielens.zip file. 
+
+3. The README file in the zip file will give you information of the project that collected the data
+
+4. The zip contains two data files: u.data and u.item
+
+-->    u.data     -- The dataset has 100000 ratings by 943 users on 1682 movies. The file has 4 tab  ("\t") separated columns.  
+
+-----------------------------
+-- Table description "u.data"
+-- 
+-- field_1     userid
+-- field_2     movieid
+-- field_3     rating
+-- field_4     unixtime
+-----------------------------
+
+-->    u.item     -- Information about the items (movies).The file has 24 pipe  ("|") separated columns.   this is a list of:
+
+movieid | movie title | release date | video release date | IMDb URL | unknown | Action | Adventure | Animation | Children's | Comedy | Crime | Documentary | Drama | Fantasy | Film-Noir | Horror | Musical | Mystery | Romance | Sci-Fi | Thriller | War | Western |
+
+The last 19 fields are the genres, a 1 indicates the movie is of that genre, a 0 indicates it is not; movies can be in several genres at once.
+The movieid's correspond to the ones used in the u.data data set.
+
+5. Copy u.data and u.item to the virtual linux machine (Filezilla)
+
+6. Copy u.data and u.item from virtual linux machine into HDFS (hadoop fs -put)
+
+7. Create one table for u.data and one table for u.item in Hive and load the data.
+
+
+------------------------
+-- Assignment Questions
+------------------------
+
+1. How many records are there in both tables? Please specify separately for each table.
+
+2. Find the name of all movies released in 1990.
+
+3. List the movieid of the 10 films that received the most ratings (not necessarily highest rating) in the table you created from u.data.
+
+4. Use a join to list the titles of the movies you found in step 3.
+
+5. Find the highest rated sci_fi movie. Explain how you define "highest rating".
+
+BONUS: Are there any movies with no ratings? (Hint: outer join and IS NULL) 
+
+
+
